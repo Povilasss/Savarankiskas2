@@ -1,0 +1,78 @@
+import java.util.Random;
+
+public class GeoLocation {
+    private double lat;
+    private double lon;
+    private static int numLocations = 0;
+
+
+    public GeoLocation() {
+        Random rand = new Random();
+        this.lat = Math.round((rand.nextDouble() * 180 - 90) * 1e6) / 1e6;
+        this.lon = Math.round((rand.nextDouble() * 360 - 180) * 1e6) / 1e6;
+        numLocations++;
+    }
+
+
+    public GeoLocation(double lat, double lon) {
+        this.lat = lat;
+        this.lon = lon;
+        numLocations++;
+    }
+
+
+    public GeoLocation(GeoLocation other) {
+        this.lat = other.lat + Math.round((Math.random() * 0.2 - 0.1) * 1e6) / 1e6;
+        this.lon = other.lon + Math.round((Math.random() * 0.2 - 0.1) * 1e6) / 1e6;
+        numLocations++;
+    }
+
+
+    public void print() {
+        System.out.println("[" + lat + ", " + lon + "]");
+    }
+
+
+    public static double distance(GeoLocation loc1, GeoLocation loc2) {
+        final double R = 6371; // Žemės spindulys kilometrais
+
+        double lat1 = Math.toRadians(loc1.lat);
+        double lon1 = Math.toRadians(loc1.lon);
+        double lat2 = Math.toRadians(loc2.lat);
+        double lon2 = Math.toRadians(loc2.lon);
+
+        double dlat = lat2 - lat1;
+        double dlon = lon2 - lon1;
+
+        double a = Math.sin(dlat / 2) * Math.sin(dlat / 2) +
+                Math.cos(lat1) * Math.cos(lat2) *
+                        Math.sin(dlon / 2) * Math.sin(dlon / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return Math.round(R * c * 1e1) / 1e1;
+    }
+
+    public static int getNumLocations() {
+        return numLocations;
+    }
+
+
+    public static void main(String[] args) {
+        GeoLocation someLocation = new GeoLocation();
+        GeoLocation vilnius = new GeoLocation(54.683333, 25.283333);
+        GeoLocation kaunas = new GeoLocation(54.897222, 23.886111);
+        GeoLocation nearVilnius = new GeoLocation(vilnius);
+
+        someLocation.print();
+        vilnius.print();
+        nearVilnius.print();
+
+        System.out.println("Number of locations: " + GeoLocation.getNumLocations());
+
+        System.out.println("From Vilnius to Kaunas: " + GeoLocation.distance(vilnius, kaunas));
+        System.out.println("From Vilnius to random location: " + GeoLocation.distance(vilnius, someLocation));
+        System.out.println("From Vilnius to random neighbour: " + GeoLocation.distance(vilnius, nearVilnius));
+    }
+}
+
